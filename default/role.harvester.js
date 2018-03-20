@@ -12,12 +12,12 @@ var roleHarvester = {
       creep.say('🚧 harvesting');
     }
     if (creep.memory.harvesting) {
-        //var sources = creep.room.find(FIND_SOURCES);
-        var closestSource = creep.room.find(FIND_SOURCES);
-        closestSource = closestSource[creep.memory.harvestSource];
-        if (creep.harvest(closestSource) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(closestSource, { visualizePathStyle: { stroke: '#090' } });
-        }
+      //var sources = creep.room.find(FIND_SOURCES);
+      var closestSource = creep.room.find(FIND_SOURCES);
+      closestSource = closestSource[creep.memory.harvestSource];
+      if (creep.harvest(closestSource) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(closestSource, { visualizePathStyle: { stroke: '#090' } });
+      }
     }
     else {
       var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -28,24 +28,24 @@ var roleHarvester = {
           ) && structure.energy < structure.energyCapacity;
         }
       });
-        //   console.log(JSON.stringify(targets));
-    //   sort(function(a,b) {
-    //     if(a.structureType == 'spawn') {
-    //         return 1;
-    //     } return 0;
-    //   });
-        // console.log(JSON.stringify(creep.name));
-        // console.log("targets: ",JSON.stringify(targets,undefined,2));
+      //   console.log(JSON.stringify(targets));
+      //   sort(function(a,b) {
+      //     if(a.structureType == 'spawn') {
+      //         return 1;
+      //     } return 0;
+      //   });
+      // console.log(JSON.stringify(creep.name));
+      // console.log("targets: ",JSON.stringify(targets,undefined,2));
       if (targets != null) {
-        console.log("A");
+        // console.log("A");
         if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        console.log("C");
+          // console.log("C");
           var result = creep.moveTo(targets, { visualizePathStyle: { stroke: '#090' } });
           console.log(result);
         }
       } else {
-          console.log("B");
-          creep.moveTo(Game.spawns["Spawn1"]);
+        // console.log("B");
+        creep.moveTo(Game.spawns["Spawn1"]);
       }
     }
   }

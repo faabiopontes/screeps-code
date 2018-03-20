@@ -113,22 +113,25 @@ module.exports.loop = function () {
         // else if (wallRepairerCount == 0) {
         //     role = 'wallRepairer';
         // }
-        // else if (upgraderCount < 11) {
-        else {
+        else if (upgraderCount < 7) {
+            // else {
             role = 'upgrader';
         }
-        Game.spawns['Spawn1'].createCreep(
-            [
-                WORK, WORK, WORK, WORK, WORK,
-                CARRY,
-                MOVE, MOVE, MOVE
-            ], undefined, {
-                role: role,
-                working: false,
-                mineSource: (countMineSource0 >= countMineSource1) ? 1 : 0,
-                source: builderContainerNotFound ? 0 : 1,
-                harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0
-            });
+        if (role != '') {
+            Game.spawns['Spawn1'].createCreep(
+                [
+                    WORK, WORK, WORK, WORK, WORK,
+                    CARRY,
+                    MOVE, MOVE, MOVE
+                ], undefined, {
+                    role: role,
+                    working: false,
+                    mineSource: (countMineSource0 >= countMineSource1) ? 1 : 0,
+                    source: builderContainerNotFound ? 0 : 1,
+                    harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0
+                }
+            );
+        }
     }
 
     console.log("harvesterTicksToLive", harvesterTicksToLive);

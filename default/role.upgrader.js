@@ -36,9 +36,18 @@ var roleUpgrader = {
             // move to controller anyway
             creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
         }
-        if (creep.room.controller.sign.text != signText) {
-            if (creep.signController(creep.room.controller, signText) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller);
+        // remove fixed String in future
+        if (creep.room.name != "E53N59") {
+            // find exit to home room
+            var exit = creep.room.findExitTo("E53N59");
+            // and move to exit
+            creep.moveTo(creep.pos.findClosestByRange(exit));
+        }
+        if (creep.room.controller.sign != undefined) {
+            if (creep.room.controller.sign.text != signText) {
+                if (creep.signController(creep.room.controller, signText) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(creep.room.controller);
+                }
             }
         }
     }
