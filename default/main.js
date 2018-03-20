@@ -83,10 +83,12 @@ module.exports.loop = function () {
     );
 
     if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
+        Game.notify("Controller almost downgrading!");
         Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, { role: 'upgrader' });
     }
 
     if (energyAvailable > 199 && harvesterCount < 1) {
+        Game.notify("We don't have any Harvester!");
         Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, {
             role: 'harvester',
             harvestSource: 1
