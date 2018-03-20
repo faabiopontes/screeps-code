@@ -22,88 +22,89 @@ module.exports.loop = function () {
     var energyAvailable = Game.rooms[room].energyAvailable;
     var energyCapacity = Game.rooms[room].energyCapacityAvailable;
     var numberConstructionSites = Game.rooms[room].find(FIND_MY_CONSTRUCTION_SITES).length;
+    var harvesterTicksToLive = 0;
 
     var mineSource = 0;
-    for(var name in Game.creeps) {
+    for (var name in Game.creeps) {
         var creep = Game.creeps[name];
-        if(creep.memory.role == 'harvester') {
+        if (creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
             harvesterCount++;
 
-            if(creep.memory.harvestSource == 0) {
+            if (creep.ticksToLive < harvesterTicksToLive || harvesterTicksToLive == 0) {
+                harvesterTicksToLive = creep.ticksToLive;
+            }
+
+            if (creep.memory.harvestSource == 0) {
                 countHarvestSource0++;
             }
-            if(creep.memory.harvestSource == 1) {
+            if (creep.memory.harvestSource == 1) {
                 countHarvestSource1++;
             }
         }
-        if(creep.memory.role == 'miner') {
+        if (creep.memory.role == 'miner') {
             roleMiner.run(creep);
             minerCount++;
         }
-        if(creep.memory.role == 'repairer') {
+        if (creep.memory.role == 'repairer') {
             roleRepairer.run(creep);
             repairerCount++;
         }
-        if(creep.memory.role == 'wallRepairer') {
+        if (creep.memory.role == 'wallRepairer') {
             roleWallRepairer.run(creep);
             wallRepairerCount++;
         }
-        if(creep.memory.role == 'upgrader') {
-
-            // creep.memory.mineSource = mineSource;
-            // if(mineSource == 1) {
-            //     mineSource = 0;
-            // } else {
-            //     mineSource = 1;
-            // }
+        if (creep.memory.role == 'upgrader') {
 
             roleUpgrader.run(creep);
             upgraderCount++;
 
-            if(creep.memory.mineSource == 0) {
+            if (creep.memory.mineSource == 0) {
                 countMineSource0++;
             }
-            if(creep.memory.mineSource == 1) {
+            if (creep.memory.mineSource == 1) {
                 countMineSource1++;
             }
         }
 
-        if(creep.memory.role == 'builder') {
+        if (creep.memory.role == 'builder') {
             roleBuilder.run(creep);
             builderCount++;
         }
     }
 
     console.log(
-        "E: "+energyAvailable+"/"+energyCapacity,
-        "H: "+harvesterCount+" ("+countHarvestSource0+"/"+countHarvestSource1+")",
-        "U: "+upgraderCount+" ("+countMineSource0+"/"+countMineSource1+")",
-        "B: "+builderCount,
-        "R: "+repairerCount,
-        "WP: "+wallRepairerCount
+        "E: " + energyAvailable + "/" + energyCapacity,
+        "H: " + harvesterCount + " (" + countHarvestSource0 + "/" + countHarvestSource1 + ")",
+        "U: " + upgraderCount + " (" + countMineSource0 + "/" + countMineSource1 + ")",
+        "B: " + builderCount,
+        "R: " + repairerCount,
+        "WP: " + wallRepairerCount
     );
 
-    if(Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
-        Game.spawns['Spawn1'].createCreep([WORK,CARRY,MOVE], undefined, {role: 'upgrader'});
+    if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
+        Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, { role: 'upgrader' });
     }
 
-    if(energyAvailable > 199 && harvesterCount < 1) {
-        Game.spawns['Spawn1'].createCreep([WORK,CARRY,MOVE], undefined, {role: 'harvester'});
+    if (energyAvailable > 199 && harvesterCount < 1) {
+        Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, {
+            role: 'harvester',
+            harvestSource: 1
+        });
     }
 
-    if(energyAvailable == energyCapacity) {
+    if (energyAvailable == energyCapacity) {
         var role = '';
         // var wallsToRepair = false;
-        if(
-        harvesterCount < 2
-        //&& Game.spawns['Spawn1'].memory.harvesterTicksToLive < 100
+        if (
+            harvesterCount < 2 ||
+            (harvesterCount == 2 && harvesterTicksToLive < 100)
         ) {
             role = 'harvester';
         }
-        else if (repairerCount < 1) {
-            role = 'repairer';
-        }
+        // else if (repairerCount < 1) {
+        //     role = 'repairer';
+        // }
         else if (builderCount <= 2 && numberConstructionSites > 0) {
             role = 'builder';
         }
@@ -114,13 +115,18 @@ module.exports.loop = function () {
         else {
             role = 'upgrader';
         }
-        Game.spawns['Spawn1'].createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE,MOVE], undefined, {
-            role: role,
-            working: false,
-            mineSource: (countMineSource0 >= countMineSource1) ? 1 : 0,
-            source: builderContainerNotFound ? 0 : 1,
-            harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0
-        });
+        Game.spawns['Spawn1'].createCreep(
+            [
+                WORK, WORK, WORK, WORK, WORK,
+                CARRY,
+                MOVE, MOVE, MOVE
+            ], undefined, {
+                role: role,
+                working: false,
+                mineSource: (countMineSource0 >= countMineSource1) ? 1 : 0,
+                source: builderContainerNotFound ? 0 : 1,
+                harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0
+            });
     }
 
     // console.log("builderContainerNotFound: ",builderContainerNotFound);
