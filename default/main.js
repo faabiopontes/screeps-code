@@ -105,7 +105,7 @@ module.exports.loop = function () {
         // else if (repairerCount < 1) {
         //     role = 'repairer';
         // }
-        else if (builderCount <= 2 && numberConstructionSites > 0) {
+        else if (builderCount < 1 && numberConstructionSites > 0) {
             role = 'builder';
         }
         // else if (wallRepairerCount == 0) {
