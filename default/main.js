@@ -95,7 +95,7 @@ module.exports.loop = function () {
         });
     }
 
-    if (energyAvailable == energyCapacity) {
+    if (energyAvailable > 699) {
         var role = '';
         // var wallsToRepair = false;
         if (
@@ -131,5 +131,6 @@ module.exports.loop = function () {
             });
     }
 
+    console.log("harvesterTicksToLive", harvesterTicksToLive);
     // console.log("builderContainerNotFound: ",builderContainerNotFound);
 }
