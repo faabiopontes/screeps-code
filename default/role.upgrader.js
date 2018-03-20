@@ -20,22 +20,24 @@ var roleUpgrader = {
             //         creep.moveTo(target);
             //     }
             // } else {
-                var sources = creep.room.find(FIND_SOURCES);
-                if (creep.harvest(sources[creep.memory.mineSource]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[creep.memory.mineSource], { visualizePathStyle: { stroke: '#900' } });
-                }
-                // if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                    // creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#900' } });
-                // }
+            var sources = creep.room.find(FIND_SOURCES);
+            if (creep.harvest(sources[creep.memory.mineSource]) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(sources[creep.memory.mineSource], { visualizePathStyle: { stroke: '#900' } });
+            }
+            // if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
+            // creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#900' } });
+            // }
             // }
         }
         else {
             if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
             }
+            // move to controller anyway
+            creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
         }
-        if(creep.room.controller.sign.text != signText) {
-            if(creep.signController(creep.room.controller, signText) == ERR_NOT_IN_RANGE) {
+        if (creep.room.controller.sign.text != signText) {
+            if (creep.signController(creep.room.controller, signText) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller);
             }
         }
