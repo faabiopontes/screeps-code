@@ -72,14 +72,21 @@ module.exports.loop = function () {
             builderCount++;
         }
     }
+    
+    sources = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
+    // console.log(JSON.stringify(sources,undefined,2));
 
     console.log(
         "E: " + energyAvailable + "/" + energyCapacity,
-        "H: " + harvesterCount + " (" + countHarvestSource0 + "/" + countHarvestSource1 + ")",
+        "H: " + harvesterCount + " (" + countHarvestSource0 + "/" + countHarvestSource1 + ") ("+harvesterTicksToLive+")",
         "U: " + upgraderCount + " (" + countMineSource0 + "/" + countMineSource1 + ")",
         "B: " + builderCount,
         "R: " + repairerCount,
-        "WP: " + wallRepairerCount
+        "WP: " + wallRepairerCount,
+        "Controller: ("+Game.spawns['Spawn1'].room.controller.progress+"/"+Game.spawns['Spawn1'].room.controller.progressTotal+")",
+        "Sources: (energy/ticks)",
+        "("+sources[0].energy+"/"+sources[0].ticksToRegeneration+")",
+        "("+sources[1].energy+"/"+sources[1].ticksToRegeneration+")",
     );
 
     if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
@@ -113,7 +120,7 @@ module.exports.loop = function () {
         // else if (wallRepairerCount == 0) {
         //     role = 'wallRepairer';
         // }
-        else if (upgraderCount < 7) {
+        else if (upgraderCount < 10) {
             // else {
             role = 'upgrader';
         }
@@ -126,14 +133,13 @@ module.exports.loop = function () {
                 ], undefined, {
                     role: role,
                     working: false,
-                    mineSource: (countMineSource0 >= countMineSource1) ? 1 : 0,
+                    mineSource: (countMineSource1 >= countMineSource0) ? 0 : 1,
                     source: builderContainerNotFound ? 0 : 1,
                     harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0
                 }
             );
         }
     }
-
-    console.log("harvesterTicksToLive", harvesterTicksToLive);
-    // console.log("builderContainerNotFound: ",builderContainerNotFound);
+    
+    // console.log(JSON.stringify(Game.spawns['Spawn1'].room.controller,undefined,2));
 }

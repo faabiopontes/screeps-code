@@ -24,11 +24,11 @@ var roleUpgrader = {
             var returnHarvest = creep.harvest(sources[creep.memory.mineSource]);
             if (returnHarvest == ERR_NOT_IN_RANGE) {
                 creep.moveTo(sources[creep.memory.mineSource], { visualizePathStyle: { stroke: '#900' } });
-            } else if (returnHarvest == ERR_NOT_ENOUGH_RESOURCES) {
+            } else if (returnHarvest == ERR_NOT_ENOUGH_RESOURCES || returnHarvest == ERR_NO_PATH) {
                 // sourceActive = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
                 // check if we can use id on the return
                 // save id on the memory of the creep instead
-                creep.memory.mineSource = (creep.memory.mineSource == 1) ? 0 : 0;
+                creep.memory.mineSource = (creep.memory.mineSource == 1) ? 0 : 1;
             }
             // if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
             // creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#900' } });

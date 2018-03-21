@@ -41,7 +41,7 @@ var roleHarvester = {
         if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
           // console.log("C");
           var result = creep.moveTo(targets, { visualizePathStyle: { stroke: '#090' } });
-          console.log(result);
+        //   console.log(result);
         }
       } else {
         // console.log("B");
