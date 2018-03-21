@@ -31,12 +31,12 @@ module.exports = {
                 // time to upgrade Controller in another room
                 else {
                     creep.memory.upgrading = true;
-                    this.goTo(creep.memory.home);
+                    this.goTo(creep,creep.memory.home);
                 }
             }
             // if not in home room...
             else if (creep.room.name == creep.memory.target && creep.memory.upgrading) {
-                this.goTo(creep.memory.home);
+                this.goTo(creep,creep.memory.home);
             }
             else if (creep.room.name == creep.memory.home && creep.memory.upgrading) {
                 // since we are in our home
@@ -46,7 +46,7 @@ module.exports = {
                 }
             }
             else {
-                this.goTo(creep.memory.target);
+                this.goTo(creep,creep.memory.target);
             }
         }
         // if creep is supposed to harvest energy from source
@@ -72,7 +72,7 @@ module.exports = {
             }
         }
     },
-    goTo: function (room) {
+    goTo: function (creep,room) {
         var exit = creep.room.findExitTo(room);
         creep.moveTo(creep.pos.findClosestByPath(exit));
     }
