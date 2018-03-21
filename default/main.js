@@ -119,11 +119,11 @@ module.exports.loop = function () {
         });
     }
 
-    if (energyAvailable > 699) {
+    if (energyAvailable > 849) {
         var parts = [
             WORK, WORK, WORK, WORK, WORK,
-            CARRY,
-            MOVE, MOVE, MOVE
+            CARRY,CARRY,CARRY,
+            MOVE, MOVE, MOVE, MOVE
         ];
 
         var role = '';
@@ -146,15 +146,14 @@ module.exports.loop = function () {
         // else if (wallRepairerCount == 0) {
         //     role = 'wallRepairer';
         // }
-        else if (upgraderCount < 10) {
+        else if (upgraderCount < 5) {
             // else {
             role = 'upgrader';
-        } else if (
-            longDistanceBuilderUpgraderCount < 3 &&
-            energyAvailable > 849
+        }
+        else if (
+            longDistanceBuilderUpgraderCount < 3
         ) {
             role = 'longDistanceBuilderUpgrader';
-            parts.push(CARRY, CARRY, MOVE);
         }
 
         if (role != '') {
