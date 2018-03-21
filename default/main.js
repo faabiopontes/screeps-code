@@ -122,8 +122,8 @@ module.exports.loop = function () {
     if (energyAvailable > 849) {
         var parts = [
             WORK, WORK, WORK, WORK, WORK,
-            CARRY,CARRY,CARRY,
-            MOVE, MOVE, MOVE, MOVE
+            CARRY,
+            MOVE, MOVE, MOVE
         ];
 
         var role = '';
@@ -138,6 +138,7 @@ module.exports.loop = function () {
             repairerCount < 1 &&
             hitsPercentage <= FSP_PERCENTAGE_TO_REPAIR
         ) {
+            parts.push(MOVE,CARRY,CARRY);
             role = 'repairer';
         }
         else if (builderCount < 1 && numberConstructionSites > 0) {
@@ -147,12 +148,16 @@ module.exports.loop = function () {
         //     role = 'wallRepairer';
         // }
         else if (upgraderCount < 5) {
+            if(!(countMineSource1 >= countMineSource0)) {
+                parts.push(MOVE,CARRY,CARRY);
+            }
             // else {
             role = 'upgrader';
         }
         else if (
             longDistanceBuilderUpgraderCount < 3
         ) {
+            parts.push(MOVE,CARRY,CARRY);
             role = 'longDistanceBuilderUpgrader';
         }
 
