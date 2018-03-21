@@ -120,6 +120,12 @@ module.exports.loop = function () {
     }
 
     if (energyAvailable > 699) {
+        var parts = [
+            WORK, WORK, WORK, WORK, WORK,
+            CARRY,
+            MOVE, MOVE, MOVE
+        ];
+
         var role = '';
         // var wallsToRepair = false;
         if (
@@ -143,17 +149,19 @@ module.exports.loop = function () {
         else if (upgraderCount < 10) {
             // else {
             role = 'upgrader';
-        } else if (longDistanceBuilderUpgraderCount < 3) {
+        } else if (
+            longDistanceBuilderUpgraderCount < 3 &&
+            energyAvailable > 849
+        ) {
             role = 'longDistanceBuilderUpgrader';
+            parts.push(CARRY, CARRY, MOVE);
         }
 
         if (role != '') {
             Game.spawns['Spawn1'].createCreep(
-                [
-                    WORK, WORK, WORK, WORK, WORK,
-                    CARRY,
-                    MOVE, MOVE, MOVE
-                ], undefined, {
+                parts,
+                undefined,
+                {
                     role: role,
                     working: false,
                     mineSource: (countMineSource1 >= countMineSource0) ? 0 : 1,
