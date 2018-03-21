@@ -2,6 +2,7 @@ var roleUpgrader = {
 
     /** @param {Creep} creep **/
     run: function (creep) {
+        // console.log("storage", creep.room.storage);
         var signText = "I just learned how to do this! Have mercy!";
 
         if (creep.memory.upgrading && creep.carry.energy == 0) {
