@@ -1,52 +1,52 @@
 module.exports = {
     // a function to run the logic for this role
     /** @param {Creep} creep */
-    run: function(creep) {
+    run: function (creep) {
+
+        creep.say('FSP');
         // if creep is bringing energy to a structure but has no energy left
         if (creep.memory.working == true && creep.carry.energy == 0) {
             // switch state
+            creep.memory.upgrading = false;
             creep.memory.working = false;
         }
         // if creep is harvesting energy but is full
         else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
             // switch state
             creep.memory.working = true;
+            creep.memory.upgrading = false;
         }
 
         // if creep is supposed to transfer energy to a structure
         if (creep.memory.working == true) {
             // if in home room
-            if (creep.room.name == creep.memory.home) {
-                // find closest spawn, extension or tower which is not full
-                var structure = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-                    // the second argument for findClosestByPath is an object which takes
-                    // a property called filter which can be a function
-                    // we use the arrow operator to define it
-                    filter: (s) => (s.structureType == STRUCTURE_SPAWN
-                                 || s.structureType == STRUCTURE_EXTENSION
-                                 || s.structureType == STRUCTURE_TOWER)
-                                 && s.energy < s.energyCapacity
-                });
-
-                if (structure == undefined) {
-                    structure = creep.room.storage;
-                }
-
-                // if we found one
-                if (structure != undefined) {
-                    // try to transfer energy, if it is not in range
-                    if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        // move towards it
-                        creep.moveTo(structure);
+            if (creep.room.name == creep.memory.target && !creep.memory.upgrading) {
+                var target = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
+                if (target) {
+                    if (creep.build(target) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target, { visualizePathStyle: { stroke: '#009' } });
                     }
+                }
+                // if we don't find any construction sites
+                // time to upgrade Controller in another room
+                else {
+                    creep.memory.upgrading = true;
+                    this.goTo(creep.memory.home);
                 }
             }
             // if not in home room...
+            else if (creep.room.name == creep.memory.target && creep.memory.upgrading) {
+                this.goTo(creep.memory.home);
+            }
+            else if (creep.room.name == creep.memory.home && creep.memory.upgrading) {
+                // since we are in our home
+                // we can simply call the code to upgrade the controller
+                if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
+                }
+            }
             else {
-                // find exit to home room
-                var exit = creep.room.findExitTo(creep.memory.home);
-                // and move to exit
-                creep.moveTo(creep.pos.findClosestByRange(exit));
+                this.goTo(creep.memory.target);
             }
         }
         // if creep is supposed to harvest energy from source
@@ -54,7 +54,7 @@ module.exports = {
             // if in target room
             if (creep.room.name == creep.memory.target) {
                 // find source
-                var source = creep.room.find(FIND_SOURCES)[creep.memory.sourceIndex];
+                var source = creep.pos.findClosestByPath(FIND_SOURCES);
 
                 // try to harvest energy, if the source is not in range
                 if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
@@ -66,9 +66,14 @@ module.exports = {
             else {
                 // find exit to target room
                 var exit = creep.room.findExitTo(creep.memory.target);
+                console.log("exit", exit);
                 // move to exit
-                creep.moveTo(creep.pos.findClosestByRange(exit));
+                creep.moveTo(creep.pos.findClosestByPath(exit));
             }
         }
+    },
+    goTo: function (room) {
+        var exit = creep.room.findExitTo(room);
+        creep.moveTo(creep.pos.findClosestByPath(exit));
     }
 };

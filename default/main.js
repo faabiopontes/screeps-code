@@ -4,6 +4,7 @@ var roleBuilder = require('role.builder');
 var roleRepairer = require('role.repairer');
 var roleMiner = require('role.miner');
 var roleWallRepairer = require('role.wallRepairer');
+var roleLongDistanceBuilderUpgrader = require('role.longDistanceBuilderUpgrader');
 require('prototype.creep');
 
 module.exports.loop = function () {
@@ -13,6 +14,7 @@ module.exports.loop = function () {
     var repairerCount = 0;
     var wallRepairerCount = 0;
     var minerCount = 0;
+    var longDistanceBuilderUpgraderCount = 0;
     var countMineSource0 = 0;
     var countMineSource1 = 0;
     var countHarvestSource0 = 0;
@@ -71,22 +73,28 @@ module.exports.loop = function () {
             roleBuilder.run(creep);
             builderCount++;
         }
+
+        if (creep.memory.role == 'longDistanceBuilderUpgrader') {
+            roleLongDistanceBuilderUpgrader.run(creep);
+            longDistanceBuilderUpgraderCount++;
+        }
     }
-    
+
     sources = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
     // console.log(JSON.stringify(sources,undefined,2));
 
     console.log(
         "E: " + energyAvailable + "/" + energyCapacity,
-        "H: " + harvesterCount + " (" + countHarvestSource0 + "/" + countHarvestSource1 + ") ("+harvesterTicksToLive+")",
+        "H: " + harvesterCount + " (" + countHarvestSource0 + "/" + countHarvestSource1 + ") (" + harvesterTicksToLive + ")",
         "U: " + upgraderCount + " (" + countMineSource0 + "/" + countMineSource1 + ")",
         "B: " + builderCount,
         "R: " + repairerCount,
         "WP: " + wallRepairerCount,
-        "Controller: ("+Game.spawns['Spawn1'].room.controller.progress+"/"+Game.spawns['Spawn1'].room.controller.progressTotal+")",
+        "LDBU: " + longDistanceBuilderUpgraderCount,
+        "Controller: (" + Game.spawns['Spawn1'].room.controller.progress + "/" + Game.spawns['Spawn1'].room.controller.progressTotal + ")",
         "Sources: (energy/ticks)",
-        "("+sources[0].energy+"/"+sources[0].ticksToRegeneration+")",
-        "("+sources[1].energy+"/"+sources[1].ticksToRegeneration+")",
+        "(" + sources[0].energy + "/" + sources[0].ticksToRegeneration + ")",
+        "(" + sources[1].energy + "/" + sources[1].ticksToRegeneration + ")",
     );
 
     if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
@@ -123,7 +131,10 @@ module.exports.loop = function () {
         else if (upgraderCount < 10) {
             // else {
             role = 'upgrader';
+        } else if (longDistanceBuilderUpgraderCount < 1) {
+            role = 'longDistanceBuilderUpgrader';
         }
+
         if (role != '') {
             Game.spawns['Spawn1'].createCreep(
                 [
@@ -135,11 +146,13 @@ module.exports.loop = function () {
                     working: false,
                     mineSource: (countMineSource1 >= countMineSource0) ? 0 : 1,
                     source: builderContainerNotFound ? 0 : 1,
-                    harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0
+                    harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0,
+                    home: "E53N59",
+                    target: "E54N59"
                 }
             );
         }
     }
-    
+
     // console.log(JSON.stringify(Game.spawns['Spawn1'].room.controller,undefined,2));
 }
