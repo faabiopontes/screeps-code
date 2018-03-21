@@ -2,6 +2,7 @@ var roleHarvester = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
+    creep.say("H");
     Game.spawns['Spawn1'].memory.harvesterTicksToLive = creep.ticksToLive;
     if (creep.memory.harvesting && creep.carry.energy == creep.carryCapacity) {
       creep.memory.harvesting = false;

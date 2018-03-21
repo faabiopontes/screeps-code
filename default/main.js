@@ -130,7 +130,7 @@ module.exports.loop = function () {
         // var wallsToRepair = false;
         if (
             harvesterCount < 2 ||
-            (harvesterCount == 2 && harvesterTicksToLive < 100)
+            (harvesterCount == 2 && harvesterTicksToLive < 200)
         ) {
             role = 'harvester';
         }
