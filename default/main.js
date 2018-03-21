@@ -8,6 +8,8 @@ var roleLongDistanceBuilderUpgrader = require('role.longDistanceBuilderUpgrader'
 require('prototype.creep');
 
 module.exports.loop = function () {
+    const FSP_PERCENTAGE_TO_REPAIR = 0.3;
+
     var harvesterCount = 0;
     var upgraderCount = 0;
     var builderCount = 0;
@@ -25,6 +27,13 @@ module.exports.loop = function () {
     var energyCapacity = Game.rooms[room].energyCapacityAvailable;
     var numberConstructionSites = Game.rooms[room].find(FIND_MY_CONSTRUCTION_SITES).length;
     var harvesterTicksToLive = 0;
+
+    var lowestStructureToRepair = Game.rooms['E53N59'].find(FIND_STRUCTURES, {
+        filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_CONTROLLER
+    }).sort(function (a, b) {
+        return a.hits - b.hits;
+    });
+    var hitsPercentage = lowestStructureToRepair[0].hits / lowestStructureToRepair[0].hitsMax;
 
     var mineSource = 0;
     for (var name in Game.creeps) {
@@ -119,9 +128,12 @@ module.exports.loop = function () {
         ) {
             role = 'harvester';
         }
-        // else if (repairerCount < 1) {
-        //     role = 'repairer';
-        // }
+        else if (
+            repairerCount < 1 &&
+            hitsPercentage <= FSP_PERCENTAGE_TO_REPAIR
+        ) {
+            role = 'repairer';
+        }
         else if (builderCount < 1 && numberConstructionSites > 0) {
             role = 'builder';
         }
@@ -131,7 +143,7 @@ module.exports.loop = function () {
         else if (upgraderCount < 10) {
             // else {
             role = 'upgrader';
-        } else if (longDistanceBuilderUpgraderCount < 1) {
+        } else if (longDistanceBuilderUpgraderCount < 3) {
             role = 'longDistanceBuilderUpgrader';
         }
 

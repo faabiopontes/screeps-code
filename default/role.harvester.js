@@ -15,9 +15,16 @@ var roleHarvester = {
       //var sources = creep.room.find(FIND_SOURCES);
       var closestSource = creep.room.find(FIND_SOURCES);
       closestSource = closestSource[creep.memory.harvestSource];
-      if (creep.harvest(closestSource) == ERR_NOT_IN_RANGE) {
+      returnHarvest = creep.harvest(closestSource);
+      if (returnHarvest == ERR_NOT_IN_RANGE) {
         creep.moveTo(closestSource, { visualizePathStyle: { stroke: '#090' } });
+      } else if (returnHarvest == ERR_NOT_ENOUGH_RESOURCES || returnHarvest == ERR_NO_PATH) {
+        // sourceActive = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+        // check if we can use id on the return
+        // save id on the memory of the creep instead
+        creep.memory.harvestSource = (creep.memory.harvestSource == 1) ? 0 : 1;
       }
+
     }
     else {
       var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -41,11 +48,14 @@ var roleHarvester = {
         if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
           // console.log("C");
           var result = creep.moveTo(targets, { visualizePathStyle: { stroke: '#090' } });
-        //   console.log(result);
+          //   console.log(result);
         }
       } else {
-        // console.log("B");
-        creep.moveTo(Game.spawns["Spawn1"]);
+        // when we don't have anywhere to put our energy
+        // we can act as upgraders
+        if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
+        }
       }
     }
   }
