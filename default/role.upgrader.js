@@ -2,6 +2,7 @@ var roleUpgrader = {
 
     /** @param {Creep} creep **/
     run: function (creep) {
+        creep.say("U");
         // console.log("storage", creep.room.storage);
         var signText = "I just learned how to do this! Have mercy!";
 

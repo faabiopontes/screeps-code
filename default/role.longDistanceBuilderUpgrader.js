@@ -3,7 +3,7 @@ module.exports = {
     /** @param {Creep} creep */
     run: function (creep) {
 
-        creep.say('FSP');
+        creep.say('LGBU');
         // if creep is bringing energy to a structure but has no energy left
         if (creep.memory.working == true && creep.carry.energy == 0) {
             // switch state
@@ -42,7 +42,7 @@ module.exports = {
                 // since we are in our home
                 // we can simply call the code to upgrade the controller
                 if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
+                    creep.moveTo(23, 30, { visualizePathStyle: { stroke: '#900' } });
                 }
             }
             else {

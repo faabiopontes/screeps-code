@@ -36,6 +36,11 @@ module.exports.loop = function () {
     var hitsPercentage = lowestStructureToRepair[0].hits / lowestStructureToRepair[0].hitsMax;
 
     var mineSource = 0;
+    // when sources regenerate
+    // recalc where creeps should mine
+    // make a find on the source, taking the closest creeps
+    // change the source of them
+    // change the source on the others as well
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
         if (creep.memory.role == 'harvester') {
@@ -102,8 +107,8 @@ module.exports.loop = function () {
         "LDBU: " + longDistanceBuilderUpgraderCount,
         "Controller: (" + Game.spawns['Spawn1'].room.controller.progress + "/" + Game.spawns['Spawn1'].room.controller.progressTotal + ")",
         "Sources: (energy/ticks)",
-        "(" + sources[0].energy + "/" + sources[0].ticksToRegeneration + ")",
-        "(" + sources[1].energy + "/" + sources[1].ticksToRegeneration + ")",
+        "(" + sources[0].energy + "/" + (sources[0].ticksToRegeneration ? sources[0].ticksToRegeneration : 300) + ")",
+        "(" + sources[1].energy + "/" + (sources[1].ticksToRegeneration ? sources[1].ticksToRegeneration : 300) + ")",
     );
 
     if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
@@ -111,15 +116,15 @@ module.exports.loop = function () {
         Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, { role: 'upgrader' });
     }
 
-    if (energyAvailable > 199 && harvesterCount < 1) {
+    if (energyAvailable > 299 && harvesterCount < 1) {
         Game.notify("We don't have any Harvester!");
-        Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, {
+        Game.spawns['Spawn1'].createCreep([WORK, WORK, CARRY, MOVE], undefined, {
             role: 'harvester',
             harvestSource: 1
         });
     }
 
-    if (energyAvailable > 699) {
+    if (energyAvailable > 849) {
         var parts = [
             WORK, WORK, WORK, WORK, WORK,
             CARRY,
@@ -130,7 +135,7 @@ module.exports.loop = function () {
         // var wallsToRepair = false;
         if (
             harvesterCount < 2 ||
-            (harvesterCount == 2 && harvesterTicksToLive < 100)
+            (harvesterCount == 2 && harvesterTicksToLive < 200)
         ) {
             role = 'harvester';
         }
@@ -138,23 +143,27 @@ module.exports.loop = function () {
             repairerCount < 1 &&
             hitsPercentage <= FSP_PERCENTAGE_TO_REPAIR
         ) {
+            parts.push(MOVE,CARRY,CARRY);
             role = 'repairer';
         }
-        else if (builderCount < 1 && numberConstructionSites > 0) {
+        else if (builderCount < 2 && numberConstructionSites > 0) {
             role = 'builder';
         }
         // else if (wallRepairerCount == 0) {
         //     role = 'wallRepairer';
         // }
-        else if (upgraderCount < 10) {
+        else if (upgraderCount < 2) {
+            if(!(countMineSource1 >= countMineSource0)) {
+                parts.push(MOVE,CARRY,CARRY);
+            }
             // else {
             role = 'upgrader';
-        } else if (
-            longDistanceBuilderUpgraderCount < 3 &&
-            energyAvailable > 849
+        }
+        else if (
+            longDistanceBuilderUpgraderCount < 3
         ) {
+            parts.push(MOVE,CARRY,CARRY);
             role = 'longDistanceBuilderUpgrader';
-            parts.push(CARRY, CARRY, MOVE);
         }
 
         if (role != '') {

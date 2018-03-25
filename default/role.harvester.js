@@ -2,6 +2,7 @@ var roleHarvester = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
+    creep.say("H");
     Game.spawns['Spawn1'].memory.harvesterTicksToLive = creep.ticksToLive;
     if (creep.memory.harvesting && creep.carry.energy == creep.carryCapacity) {
       creep.memory.harvesting = false;
@@ -13,6 +14,13 @@ var roleHarvester = {
     }
     if (creep.memory.harvesting) {
       //var sources = creep.room.find(FIND_SOURCES);
+      const droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+        if(droppedResource) {
+            if(creep.pickup(droppedResource) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(droppedResource);
+            }
+            return;
+        }
       var closestSource = creep.room.find(FIND_SOURCES);
       closestSource = closestSource[creep.memory.harvestSource];
       returnHarvest = creep.harvest(closestSource);
