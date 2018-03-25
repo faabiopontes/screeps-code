@@ -39,10 +39,17 @@ module.exports = {
                 this.goTo(creep, creep.memory.home);
             }
             else if (creep.room.name == creep.memory.home && creep.memory.upgrading) {
-                // since we are in our home
-                // we can simply call the code to upgrade the controller
-                if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(23, 30, { visualizePathStyle: { stroke: '#900' } });
+                var target = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
+                if (target) {
+                    if (creep.build(target) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target, { visualizePathStyle: { stroke: '#009' } });
+                    }
+                } else {
+                    // since we are in our home
+                    // we can simply call the code to upgrade the controller
+                    if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(23, 30, { visualizePathStyle: { stroke: '#900' } });
+                    }
                 }
             }
             else {
