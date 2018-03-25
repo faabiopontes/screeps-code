@@ -33,6 +33,14 @@ module.exports.loop = function () {
     }).sort(function (a, b) {
         return a.hits - b.hits;
     });
+
+    var findInvaders = Game.rooms['E53N59'].find(FIND_HOSTILE_CREEPS, {
+        filter: (s) => s.owner.username == 'Invader'
+    })
+    if (findInvaders) {
+        Game.notify("OUR FORCES ARE UNDER ATTACK!");
+    }
+
     var hitsPercentage = lowestStructureToRepair[0].hits / lowestStructureToRepair[0].hitsMax;
 
     var mineSource = 0;
@@ -43,6 +51,19 @@ module.exports.loop = function () {
     // change the source on the others as well
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
+
+        if (findInvaders) {
+            var exit = creep.room.findExitTo("E54N59");
+            creep.moveTo(creep.pos.findClosestByPath(exit));
+            creep.memory.underAttack = true;
+            creep.say("RUN FOR YOUR LIVES!");
+        } else if (creep.room.name != "E53N59" && creep.memory.underAttack == true) {
+            var exit = creep.room.findExitTo("E53N59");
+            creep.moveTo(creep.pos.findClosestByPath(exit));
+        } else if (creep.room.name == "E53N59" && creep.memory.underAttack == true) {
+            creep.memory.underAttack = false;
+        }
+
         if (creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
             harvesterCount++;
