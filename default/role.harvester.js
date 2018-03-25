@@ -15,12 +15,12 @@ var roleHarvester = {
     if (creep.memory.harvesting) {
       //var sources = creep.room.find(FIND_SOURCES);
       const droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
-        if(droppedResource) {
-            if(creep.pickup(droppedResource) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(droppedResource);
-            }
-            return;
+      if (droppedResource) {
+        if (creep.pickup(droppedResource) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(droppedResource);
         }
+        return;
+      }
       var closestSource = creep.room.find(FIND_SOURCES);
       closestSource = closestSource[creep.memory.harvestSource];
       returnHarvest = creep.harvest(closestSource);
@@ -36,11 +36,12 @@ var roleHarvester = {
     }
     else {
       var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (structure) => {
+        filter: (s) => {
           return (
-            structure.structureType == STRUCTURE_EXTENSION ||
-            structure.structureType == STRUCTURE_SPAWN
-          ) && structure.energy < structure.energyCapacity;
+            s.structureType == STRUCTURE_EXTENSION ||
+            s.structureType == STRUCTURE_SPAWN ||
+            s.structureType == STRUCTURE_TOWER
+          ) && s.energy < s.energyCapacity;
         }
       });
       //   console.log(JSON.stringify(targets));
