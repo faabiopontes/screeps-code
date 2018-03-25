@@ -160,7 +160,7 @@ module.exports.loop = function () {
             role = 'upgrader';
         }
         else if (
-            longDistanceBuilderUpgraderCount < 3
+            longDistanceBuilderUpgraderCount < 5
         ) {
             parts.push(MOVE, CARRY, CARRY);
             role = 'longDistanceBuilderUpgrader';
