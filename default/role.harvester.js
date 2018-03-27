@@ -35,36 +35,51 @@ var roleHarvester = {
 
     }
     else {
-      var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+      var target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: (s) => {
           return (
             s.structureType == STRUCTURE_EXTENSION ||
             s.structureType == STRUCTURE_SPAWN ||
             s.structureType == STRUCTURE_TOWER
+            // || s.structureType == STRUCTURE_CONTAINER
           ) && s.energy < s.energyCapacity;
         }
       });
-      //   console.log(JSON.stringify(targets));
+      //   console.log(JSON.stringify(target));
       //   sort(function(a,b) {
       //     if(a.structureType == 'spawn') {
       //         return 1;
       //     } return 0;
       //   });
       // console.log(JSON.stringify(creep.name));
-      // console.log("targets: ",JSON.stringify(targets,undefined,2));
-      if (targets != null) {
+      // console.log("target: ",JSON.stringify(target,undefined,2));
+      if (target != null) {
         // console.log("A");
-        if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
           // console.log("C");
-          var result = creep.moveTo(targets, { visualizePathStyle: { stroke: '#090' } });
+          var result = creep.moveTo(target, { visualizePathStyle: { stroke: '#090' } });
           //   console.log(result);
         }
       } else {
+        var target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+          filter: (s) => {
+            return (
+              s.structureType == STRUCTURE_CONTAINER ||
+              s.structureType == STRUCTURE_STORAGE
+            ) && s.energy < s.energyCapacity;
+          }
+        });
+
+        if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+          // console.log("C");
+          var result = creep.moveTo(target, { visualizePathStyle: { stroke: '#090' } });
+          //   console.log(result);
+        }
         // when we don't have anywhere to put our energy
         // we can act as upgraders
-        if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-          creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
-        }
+        // if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+        //   creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
+        // }
       }
     }
   }
