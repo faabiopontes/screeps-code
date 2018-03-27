@@ -37,9 +37,10 @@ module.exports.loop = function () {
     var findInvaders = Game.rooms['E53N59'].find(FIND_HOSTILE_CREEPS, {
         filter: (s) => s.owner.username == 'Invader'
     })
-    if (findInvaders) {
-        Game.notify("OUR FORCES ARE UNDER ATTACK!");
+    if (findInvaders.length) {
+        Game.notify("OUR FORCES ARE UNDER ATTACK!")
     }
+
 
     var hitsPercentage = lowestStructureToRepair[0].hits / lowestStructureToRepair[0].hitsMax;
 
@@ -52,16 +53,19 @@ module.exports.loop = function () {
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
 
-        if (findInvaders) {
+        if (findInvaders.length) {
             var exit = creep.room.findExitTo("E54N59");
             creep.moveTo(creep.pos.findClosestByPath(exit));
             creep.memory.underAttack = true;
             creep.say("RUN FOR YOUR LIVES!");
+            continue;
         } else if (creep.room.name != "E53N59" && creep.memory.underAttack == true) {
             var exit = creep.room.findExitTo("E53N59");
             creep.moveTo(creep.pos.findClosestByPath(exit));
+            continue;
         } else if (creep.room.name == "E53N59" && creep.memory.underAttack == true) {
             creep.memory.underAttack = false;
+            continue;
         }
 
         if (creep.memory.role == 'harvester') {
@@ -132,75 +136,77 @@ module.exports.loop = function () {
         "(" + sources[1].energy + "/" + (sources[1].ticksToRegeneration ? sources[1].ticksToRegeneration : 300) + ")",
     );
 
-    if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
-        Game.notify("Controller almost downgrading!");
-        Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, { role: 'upgrader' });
-    }
-
-    if (energyAvailable > 299 && harvesterCount < 1) {
-        Game.notify("We don't have any Harvester!");
-        Game.spawns['Spawn1'].createCreep([WORK, WORK, CARRY, MOVE], undefined, {
-            role: 'harvester',
-            harvestSource: 1
-        });
-    }
-
-    if (energyAvailable > 849) {
-        var parts = [
-            WORK, WORK, WORK, WORK, WORK,
-            CARRY,
-            MOVE, MOVE, MOVE
-        ];
-
-        var role = '';
-        // var wallsToRepair = false;
-        if (
-            harvesterCount < 2 ||
-            (harvesterCount == 2 && harvesterTicksToLive < 200)
-        ) {
-            role = 'harvester';
+    if (findInvaders.length == 0) {
+        if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
+            Game.notify("Controller almost downgrading!");
+            Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, { role: 'upgrader' });
         }
-        else if (
-            repairerCount < 1 &&
-            hitsPercentage <= FSP_PERCENTAGE_TO_REPAIR
-        ) {
-            parts.push(MOVE, CARRY, CARRY);
-            role = 'repairer';
+
+        if (energyAvailable > 299 && harvesterCount < 1) {
+            Game.notify("We don't have any Harvester!");
+            Game.spawns['Spawn1'].createCreep([WORK, WORK, CARRY, MOVE], undefined, {
+                role: 'harvester',
+                harvestSource: 1
+            });
         }
-        else if (builderCount < 2 && numberConstructionSites > 0) {
-            role = 'builder';
-        }
-        // else if (wallRepairerCount == 0) {
-        //     role = 'wallRepairer';
-        // }
-        else if (upgraderCount < 2) {
-            if (!(countMineSource1 >= countMineSource0)) {
-                parts.push(MOVE, CARRY, CARRY);
+
+        if (energyAvailable > 849) {
+            var parts = [
+                WORK, WORK, WORK, WORK, WORK,
+                CARRY,
+                MOVE, MOVE, MOVE
+            ];
+
+            var role = '';
+            // var wallsToRepair = false;
+            if (
+                harvesterCount < 2 ||
+                (harvesterCount == 2 && harvesterTicksToLive < 200)
+            ) {
+                role = 'harvester';
             }
-            // else {
-            role = 'upgrader';
-        }
-        else if (
-            longDistanceBuilderUpgraderCount < 5
-        ) {
-            parts.push(MOVE, CARRY, CARRY);
-            role = 'longDistanceBuilderUpgrader';
-        }
-
-        if (role != '') {
-            Game.spawns['Spawn1'].createCreep(
-                parts,
-                undefined,
-                {
-                    role: role,
-                    working: false,
-                    mineSource: (countMineSource1 >= countMineSource0) ? 0 : 1,
-                    source: builderContainerNotFound ? 0 : 1,
-                    harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0,
-                    home: "E53N59",
-                    target: "E54N59"
+            else if (
+                repairerCount < 1 &&
+                hitsPercentage <= FSP_PERCENTAGE_TO_REPAIR
+            ) {
+                parts.push(MOVE, CARRY, CARRY);
+                role = 'repairer';
+            }
+            else if (builderCount < 2 && numberConstructionSites > 0) {
+                role = 'builder';
+            }
+            // else if (wallRepairerCount == 0) {
+            //     role = 'wallRepairer';
+            // }
+            else if (upgraderCount < 4) {
+                if (!(countMineSource1 >= countMineSource0)) {
+                    parts.push(MOVE, CARRY, CARRY);
                 }
-            );
+                // else {
+                role = 'upgrader';
+            }
+            else if (
+                longDistanceBuilderUpgraderCount < 2
+            ) {
+                parts.push(MOVE, CARRY, CARRY);
+                role = 'longDistanceBuilderUpgrader';
+            }
+
+            if (role != '') {
+                Game.spawns['Spawn1'].createCreep(
+                    parts,
+                    undefined,
+                    {
+                        role: role,
+                        working: false,
+                        mineSource: (countMineSource1 >= countMineSource0) ? 0 : 1,
+                        source: builderContainerNotFound ? 0 : 1,
+                        harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0,
+                        home: "E53N59",
+                        target: "E52N59"
+                    }
+                );
+            }
         }
     }
 

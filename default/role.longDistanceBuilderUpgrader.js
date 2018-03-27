@@ -64,9 +64,13 @@ module.exports = {
                 var source = creep.pos.findClosestByPath(FIND_SOURCES);
 
                 // try to harvest energy, if the source is not in range
-                if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                var result = creep.harvest(source);
+                console.log(result);
+                if (result == ERR_NOT_IN_RANGE) {
                     // move towards the source
                     creep.moveTo(source);
+                } else if (result == ERR_NOT_OWNER) {
+                    Game.notify("WE CAN'T MINE A ROOM WITH A OWNER!");
                 }
             }
             // if not in target room
