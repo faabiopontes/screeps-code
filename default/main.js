@@ -39,6 +39,7 @@ module.exports.loop = function () {
     })
     if (findInvaders.length) {
         Game.notify("OUR FORCES ARE UNDER ATTACK!")
+        console.log("OUR FORCES ARE UNDER ATTACK");
     }
 
 
@@ -208,6 +209,10 @@ module.exports.loop = function () {
                 );
             }
         }
+    } else {
+        var towers = Game.rooms["E53N59"].find(
+            FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER } });
+        towers.forEach(tower => tower.attack(findInvaders[0]));
     }
 
     // console.log(JSON.stringify(Game.spawns['Spawn1'].room.controller,undefined,2));
