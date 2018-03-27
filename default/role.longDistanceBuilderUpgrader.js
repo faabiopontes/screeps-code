@@ -2,6 +2,7 @@ module.exports = {
     // a function to run the logic for this role
     /** @param {Creep} creep */
     run: function (creep) {
+        creep.memory.target = "E54N59";
 
         creep.say('LGBU');
         // if creep is bringing energy to a structure but has no energy left
