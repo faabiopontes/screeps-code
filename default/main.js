@@ -2,6 +2,7 @@ var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var roleRepairer = require('role.repairer');
+var roleClaimer = require('role.claimer');
 var roleMiner = require('role.miner');
 var roleWallRepairer = require('role.wallRepairer');
 var roleLongDistanceBuilderUpgrader = require('role.longDistanceBuilderUpgrader');
@@ -17,6 +18,7 @@ module.exports.loop = function () {
     var wallRepairerCount = 0;
     var minerCount = 0;
     var longDistanceBuilderUpgraderCount = 0;
+    var claimerCount = 0;
     var countMineSource0 = 0;
     var countMineSource1 = 0;
     var countHarvestSource0 = 0;
@@ -114,6 +116,11 @@ module.exports.loop = function () {
             builderCount++;
         }
 
+        if (creep.memory.role == 'claimer') {
+            roleClaimer.run(creep);
+            claimerCount++;
+        }
+
         if (creep.memory.role == 'longDistanceBuilderUpgrader') {
             roleLongDistanceBuilderUpgrader.run(creep);
             longDistanceBuilderUpgraderCount++;
@@ -204,10 +211,20 @@ module.exports.loop = function () {
                         source: builderContainerNotFound ? 0 : 1,
                         harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0,
                         home: "E53N59",
-                        target: "E52N59"
+                        target: "E54N59"
                     }
                 );
             }
+            // else {
+            //     Game.spawns['Spawn1'].createCreep(
+            //         [CLAIM, WORK, CARRY, MOVE],
+            //         undefined,
+            //         {
+            //             role: 'claimer',
+            //             target: "E54N59"
+            //         }
+            //     );
+            // }
         }
     } else {
         var towers = Game.rooms["E53N59"].find(
