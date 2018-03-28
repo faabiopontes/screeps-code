@@ -3,7 +3,13 @@ var roleHarvester = {
   /** @param {Creep} creep **/
   run: function (creep) {
     creep.say("H");
-    Game.spawns['Spawn1'].memory.harvesterTicksToLive = creep.ticksToLive;
+    if (creep.memory.target && creep.room.name != creep.memory.target) {
+      // find exit to target room
+      var exit = creep.room.findExitTo(creep.memory.target);
+      // move to exit
+      creep.moveTo(creep.pos.findClosestByPath(exit), { visualizePathStyle: { stroke: '#FFF' } });
+      return;
+    }
     if (creep.memory.harvesting && creep.carry.energy == creep.carryCapacity) {
       creep.memory.harvesting = false;
       creep.say('🔄 filling');
@@ -70,10 +76,19 @@ var roleHarvester = {
           }
         });
 
-        if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-          // console.log("C");
-          var result = creep.moveTo(target, { visualizePathStyle: { stroke: '#090' } });
-          //   console.log(result);
+        if (target != null) {
+          if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            // console.log("C");
+            var result = creep.moveTo(target, { visualizePathStyle: { stroke: '#090' } });
+            //   console.log(result);
+          }
+        }
+        // if the creep can't find spawns, extensions
+        // or storages and containers
+        // it becomes a longDistanceBuilderUpgrader
+        else {
+          creep.memory.role = 'longDistanceBuilderUpgrader';
+          creep.memory.target = 'E54N59';
         }
         // when we don't have anywhere to put our energy
         // we can act as upgraders
