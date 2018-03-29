@@ -12,6 +12,7 @@ module.exports.loop = function () {
   const FSP_PERCENTAGE_TO_REPAIR = 0.3;
 
   var harvesterCount = 0;
+  var E54N59_harvesterCount = 0;
   var upgraderCount = 0;
   var builderCount = 0;
   var repairerCount = 0;
@@ -74,6 +75,10 @@ module.exports.loop = function () {
     if (creep.memory.role == 'harvester') {
       roleHarvester.run(creep);
       harvesterCount++;
+
+      if (creep.memory.home = 'E54N59') {
+        E54N59_harvesterCount++;
+      }
 
       if (creep.ticksToLive < harvesterTicksToLive || harvesterTicksToLive == 0) {
         harvesterTicksToLive = creep.ticksToLive;
@@ -159,7 +164,13 @@ module.exports.loop = function () {
     }
 
     if (Game.rooms['E54N59'].energyAvailable > 299) {
-      Game.spawns['Spawn2'].spawnCreep([WORK, WORK, CARRY, MOVE], undefined, { role: 'harvester', home: 'E54N59' });
+      if(E54N59_harvesterCount < 2) {
+        E54N59_role = 'harvester';
+      } else {
+        E54N59_role = 'upgrader';
+      }
+
+      Game.spawns['Spawn2'].spawnCreep([WORK, WORK, CARRY, MOVE], undefined, {role: E54N59_role, home: 'E54N59', harvestSource: 0 });
     }
 
     if (energyAvailable > 849) {
