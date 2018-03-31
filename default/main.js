@@ -14,6 +14,7 @@ module.exports.loop = function () {
   var harvesterCount = 0;
   var E54N59_harvesterCount = 0;
   var E54N59_upgraderCount = 0;
+  var E54N59_attackerCount = 0;
   var upgraderCount = 0;
   var builderCount = 0;
   var repairerCount = 0;
@@ -58,20 +59,20 @@ module.exports.loop = function () {
   for (var name in Game.creeps) {
     var creep = Game.creeps[name];
 
-    if (findInvaders.length) {
-      var exit = creep.room.findExitTo("E54N59");
-      creep.moveTo(creep.pos.findClosestByPath(exit));
-      creep.memory.underAttack = true;
-      creep.say("RUN FOR YOUR LIVES!");
-      continue;
-    } else if (creep.room.name != "E53N59" && creep.memory.underAttack == true) {
-      var exit = creep.room.findExitTo("E53N59");
-      creep.moveTo(creep.pos.findClosestByPath(exit));
-      continue;
-    } else if (creep.room.name == "E53N59" && creep.memory.underAttack == true) {
-      creep.memory.underAttack = false;
-      continue;
-    }
+    // if (findInvaders.length) {
+    //   var exit = creep.room.findExitTo("E54N59");
+    //   creep.moveTo(creep.pos.findClosestByPath(exit));
+    //   creep.memory.underAttack = true;
+    //   creep.say("RUN FOR YOUR LIVES!");
+    //   continue;
+    // } else if (creep.room.name != "E53N59" && creep.memory.underAttack == true) {
+    //   var exit = creep.room.findExitTo("E53N59");
+    //   creep.moveTo(creep.pos.findClosestByPath(exit));
+    //   continue;
+    // } else if (creep.room.name == "E53N59" && creep.memory.underAttack == true) {
+    //   creep.memory.underAttack = false;
+    //   continue;
+    // }
 
     if (creep.memory.role == 'harvester') {
       roleHarvester.run(creep);
@@ -95,6 +96,7 @@ module.exports.loop = function () {
       }
     }
     if (creep.memory.role == 'attacker') {
+      E54N59_attackerCount++;
       hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
       let attackReturn = creep.attack(hostileCreep);
       console.log("attackReturn", attackReturn);
@@ -182,17 +184,24 @@ module.exports.loop = function () {
     console.log("E54N59_upgraderCount", E54N59_upgraderCount);
     if (Game.rooms['E54N59'].energyAvailable > 299) {
       E54N59_role = '';
-      console.log("AAA");
+      E54N59_parts = [WORK, WORK, CARRY, MOVE];
+
+      E54N59_hostileCreeps = Game.rooms['E54N59'].find(FIND_HOSTILE_CREEPS);
+
+
 
       if (E54N59_harvesterCount < 2) {
         E54N59_role = 'harvester';
       } else if (E54N59_upgraderCount < 10) {
         E54N59_role = 'upgrader';
+      } else if (E54N59_hostileCreeps.length > 0 && E54N59_attackerCount == 0) {
+        E54N59_role = 'attacker';
+        E54N59_parts = [ATTACK, MOVE];
       }
 
       console.log("E54N59_role", E54N59_role);
       if (E54N59_role != '') {
-        var retornoSpawn = Game.spawns['Spawn2'].createCreep([WORK, WORK, CARRY, MOVE], undefined, { role: E54N59_role, target: 'E54N59', home: 'E54N59', mineSource: 0 });
+        var retornoSpawn = Game.spawns['Spawn2'].createCreep(E54N59_parts, undefined, { role: E54N59_role, target: 'E54N59', home: 'E54N59', mineSource: 0 });
         console.log(retornoSpawn);
       }
     }
