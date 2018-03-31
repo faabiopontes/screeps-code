@@ -45,9 +45,10 @@ var roleUpgrader = {
             creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
         }
         // remove fixed String in future
-        if (creep.room.name != "E53N59") {
+        if (creep.room.name != creep.room.home) {
+            console.log("room.name");
             // find exit to home room
-            var exit = creep.room.findExitTo("E53N59");
+            var exit = creep.room.findExitTo(creep.room.home);
             // and move to exit
             creep.moveTo(creep.pos.findClosestByRange(exit));
         }

@@ -28,7 +28,7 @@ var roleHarvester = {
         return;
       }
       var closestSource = creep.room.find(FIND_SOURCES);
-      closestSource = closestSource[creep.memory.harvestSource];
+      closestSource = closestSource[creep.memory.mineSource];
       returnHarvest = creep.harvest(closestSource);
       if (returnHarvest == ERR_NOT_IN_RANGE) {
         creep.moveTo(closestSource, { visualizePathStyle: { stroke: '#090' } });
@@ -36,7 +36,7 @@ var roleHarvester = {
         // sourceActive = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
         // check if we can use id on the return
         // save id on the memory of the creep instead
-        creep.memory.harvestSource = (creep.memory.harvestSource == 1) ? 0 : 1;
+        creep.memory.mineSource = (creep.memory.mineSource == 1) ? 0 : 1;
       }
 
     }

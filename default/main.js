@@ -84,10 +84,10 @@ module.exports.loop = function () {
         harvesterTicksToLive = creep.ticksToLive;
       }
 
-      if (creep.memory.harvestSource == 0) {
+      if (creep.memory.mineSource == 0) {
         countHarvestSource0++;
       }
-      if (creep.memory.harvestSource == 1) {
+      if (creep.memory.mineSource == 1) {
         countHarvestSource1++;
       }
     }
@@ -159,18 +159,24 @@ module.exports.loop = function () {
       Game.notify("We don't have any Harvester!");
       Game.spawns['Spawn1'].createCreep([WORK, WORK, CARRY, MOVE], undefined, {
         role: 'harvester',
-        harvestSource: 1
+        mineSource: 1
       });
     }
 
+    console.log("E54N59 energyAvailable", Game.rooms['E54N59'].energyAvailable);
+
     if (Game.rooms['E54N59'].energyAvailable > 299) {
-      if(E54N59_harvesterCount < 2) {
+      console.log("A");
+      if (E54N59_harvesterCount < 2) {
         E54N59_role = 'harvester';
       } else {
         E54N59_role = 'upgrader';
       }
 
-      Game.spawns['Spawn2'].spawnCreep([WORK, WORK, CARRY, MOVE], undefined, {role: E54N59_role, home: 'E54N59', harvestSource: 0 });
+      console.log("E54N59_role", E54N59_role);
+
+      var retornoSpawn = Game.spawns['Spawn2'].createCreep([WORK, WORK, CARRY, MOVE], undefined, { role: E54N59_role, target: 'E54N59', home: 'E54N59', mineSource: 0 });
+      console.log(retornoSpawn);
     }
 
     if (energyAvailable > 849) {
@@ -180,11 +186,9 @@ module.exports.loop = function () {
         MOVE, MOVE, MOVE
       ];
       var memory = {
-        role: role,
         working: false,
-        mineSource: (countMineSource1 >= countMineSource0) ? 0 : 1,
         source: builderContainerNotFound ? 0 : 1,
-        harvestSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0,
+        mineSource: (countHarvestSource0 >= countHarvestSource1) ? 1 : 0,
         home: "E53N59"
       };
 
@@ -223,6 +227,8 @@ module.exports.loop = function () {
         role = 'longDistanceBuilderUpgrader';
         memory.target = "E54N59";
       }
+
+      memory.role = role;
 
       if (role != '') {
         Game.spawns['Spawn1'].createCreep(
