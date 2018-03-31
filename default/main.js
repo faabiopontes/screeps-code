@@ -76,7 +76,7 @@ module.exports.loop = function () {
       roleHarvester.run(creep);
       harvesterCount++;
 
-      if (creep.memory.home = 'E54N59') {
+      if (creep.memory.home == 'E54N59') {
         E54N59_harvesterCount++;
       }
 
@@ -90,6 +90,11 @@ module.exports.loop = function () {
       if (creep.memory.mineSource == 1) {
         countHarvestSource1++;
       }
+    }
+    if (creep.memory.role == 'attacker') {
+      hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+      let attackReturn = creep.attack(hostileCreep);
+      console.log("attackReturn", attackReturn);
     }
     if (creep.memory.role == 'miner') {
       roleMiner.run(creep);
@@ -152,21 +157,24 @@ module.exports.loop = function () {
   if (findInvaders.length == 0) {
     if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
       Game.notify("Controller almost downgrading!");
-      Game.spawns['Spawn1'].createCreep([WORK, CARRY, MOVE], undefined, { role: 'upgrader' });
+      Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], undefined, { memory: { role: 'upgrader' } });
     }
 
     if (energyAvailable > 299 && harvesterCount < 1) {
       Game.notify("We don't have any Harvester!");
-      Game.spawns['Spawn1'].createCreep([WORK, WORK, CARRY, MOVE], undefined, {
-        role: 'harvester',
-        mineSource: 1
+      Game.spawns['Spawn1'].spawnCreep([WORK, WORK, CARRY, MOVE], undefined, {
+        memory: {
+          role: 'harvester',
+          mineSource: 1
+        }
       });
     }
 
     console.log("E54N59 energyAvailable", Game.rooms['E54N59'].energyAvailable);
-
+    console.log("E54N59_harvesterCount", E54N59_harvesterCount);
     if (Game.rooms['E54N59'].energyAvailable > 299) {
-      console.log("A");
+      console.log("AAA");
+
       if (E54N59_harvesterCount < 2) {
         E54N59_role = 'harvester';
       } else {
@@ -231,10 +239,10 @@ module.exports.loop = function () {
       memory.role = role;
 
       if (role != '') {
-        Game.spawns['Spawn1'].createCreep(
+        Game.spawns['Spawn1'].spawnCreep(
           parts,
           undefined,
-          memory
+          { memory: memory }
         );
       }
       // else {
