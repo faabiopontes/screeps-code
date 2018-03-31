@@ -3,7 +3,7 @@ module.exports = {
     /** @param {Creep} creep */
     run: function (creep) {
 
-        creep.say('LGBU');
+        //creep.say('LGBU');
         // if creep is bringing energy to a structure but has no energy left
         if (creep.memory.working == true && creep.carry.energy == 0) {
             // switch state

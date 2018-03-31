@@ -2,7 +2,7 @@ var roleHarvester = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
-    creep.say("H");
+    //creep.say("H");
     if (creep.memory.target && creep.room.name != creep.memory.target) {
       // find exit to target room
       var exit = creep.room.findExitTo(creep.memory.target);
@@ -20,6 +20,7 @@ var roleHarvester = {
     }
     if (creep.memory.harvesting) {
       //var sources = creep.room.find(FIND_SOURCES);
+      // KEEP IN MIND THAT THIS CODE IS EXECUTED FOR EACH CREEP
       const droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
       if (droppedResource) {
         if (creep.pickup(droppedResource) == ERR_NOT_IN_RANGE) {
@@ -27,6 +28,20 @@ var roleHarvester = {
         }
         return;
       }
+      // const tombstones = creep.room.find(FIND_TOMBSTONES);
+      // if (tombstones.length > 0) {
+      //   console.log("FIND TOMBSTONES");
+      //   for (let tombstone in tombstones) {
+      //     let closestCreep = tombstone.findClosestByPath(FIND_MY_CREEPS);
+
+      //     let returnWithdraw = closestCreep.withdraw(tombstone, RESOURCE_ENERGY);
+      //     console.log('returnWithdraw', returnWithdraw);
+      //     if (returnWithdraw == ERR_NOT_IN_RANGE) {
+      //       closestCreep.moveTo(tombstone);
+      //     }
+      //   }
+      //   return;
+      // }
       var closestSource = creep.room.find(FIND_SOURCES);
       closestSource = closestSource[creep.memory.mineSource];
       returnHarvest = creep.harvest(closestSource);

@@ -2,7 +2,7 @@ var roleUpgrader = {
 
     /** @param {Creep} creep **/
     run: function (creep) {
-        creep.say("U");
+        //creep.say("U");
         // console.log("storage", creep.room.storage);
         var signText = "I just learned how to do this! Have mercy!";
 
@@ -48,10 +48,10 @@ var roleUpgrader = {
 
         }
         // remove fixed String in future
-        if (creep.room.name != creep.room.home) {
-            console.log("room.name");
+        if (creep.room.name != creep.memory.home) {
+            console.log("OUTSIDE ROOM " + creep.memory.home, creep.name);
             // find exit to home room
-            var exit = creep.room.findExitTo(creep.room.home);
+            var exit = creep.room.findExitTo(creep.memory.home);
             // and move to exit
             creep.moveTo(creep.pos.findClosestByRange(exit));
         }
