@@ -13,6 +13,7 @@ module.exports.loop = function () {
 
   var harvesterCount = 0;
   var E54N59_harvesterCount = 0;
+  var E54N59_upgraderCount = 0;
   var upgraderCount = 0;
   var builderCount = 0;
   var repairerCount = 0;
@@ -74,21 +75,23 @@ module.exports.loop = function () {
 
     if (creep.memory.role == 'harvester') {
       roleHarvester.run(creep);
-      harvesterCount++;
 
       if (creep.memory.home == 'E54N59') {
+        console.log(JSON.stringify(creep.name));
         E54N59_harvesterCount++;
-      }
+      } else {
+        harvesterCount++;
 
-      if (creep.ticksToLive < harvesterTicksToLive || harvesterTicksToLive == 0) {
-        harvesterTicksToLive = creep.ticksToLive;
-      }
+        if (creep.ticksToLive < harvesterTicksToLive || harvesterTicksToLive == 0) {
+          harvesterTicksToLive = creep.ticksToLive;
+        }
 
-      if (creep.memory.mineSource == 0) {
-        countHarvestSource0++;
-      }
-      if (creep.memory.mineSource == 1) {
-        countHarvestSource1++;
+        if (creep.memory.mineSource == 0) {
+          countHarvestSource0++;
+        }
+        if (creep.memory.mineSource == 1) {
+          countHarvestSource1++;
+        }
       }
     }
     if (creep.memory.role == 'attacker') {
@@ -111,6 +114,10 @@ module.exports.loop = function () {
     if (creep.memory.role == 'upgrader') {
 
       roleUpgrader.run(creep);
+      if (creep.memory.home == 'E54N59') {
+        E54N59_upgraderCount++;
+        continue;
+      }
       upgraderCount++;
 
       if (creep.memory.mineSource == 0) {
@@ -157,12 +164,12 @@ module.exports.loop = function () {
   if (findInvaders.length == 0) {
     if (Game.spawns['Spawn1'].energy > 199 && Game.spawns['Spawn1'].room.controller.ticksToDowngrade < 300) {
       Game.notify("Controller almost downgrading!");
-      Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], undefined, { memory: { role: 'upgrader' } });
+      Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], 'upgrader' + Game.time, { memory: { role: 'upgrader' } });
     }
 
     if (energyAvailable > 299 && harvesterCount < 1) {
       Game.notify("We don't have any Harvester!");
-      Game.spawns['Spawn1'].spawnCreep([WORK, WORK, CARRY, MOVE], undefined, {
+      Game.spawns['Spawn1'].spawnCreep([WORK, WORK, CARRY, MOVE], 'harvester' + Game.time, {
         memory: {
           role: 'harvester',
           mineSource: 1
@@ -172,22 +179,26 @@ module.exports.loop = function () {
 
     console.log("E54N59 energyAvailable", Game.rooms['E54N59'].energyAvailable);
     console.log("E54N59_harvesterCount", E54N59_harvesterCount);
+    console.log("E54N59_upgraderCount", E54N59_upgraderCount);
     if (Game.rooms['E54N59'].energyAvailable > 299) {
+      E54N59_role = '';
       console.log("AAA");
 
       if (E54N59_harvesterCount < 2) {
         E54N59_role = 'harvester';
-      } else {
+      } else if (E54N59_upgraderCount < 10) {
         E54N59_role = 'upgrader';
       }
 
       console.log("E54N59_role", E54N59_role);
-
-      var retornoSpawn = Game.spawns['Spawn2'].createCreep([WORK, WORK, CARRY, MOVE], undefined, { role: E54N59_role, target: 'E54N59', home: 'E54N59', mineSource: 0 });
-      console.log(retornoSpawn);
+      if (E54N59_role != '') {
+        var retornoSpawn = Game.spawns['Spawn2'].createCreep([WORK, WORK, CARRY, MOVE], undefined, { role: E54N59_role, target: 'E54N59', home: 'E54N59', mineSource: 0 });
+        console.log(retornoSpawn);
+      }
     }
 
     if (energyAvailable > 849) {
+      console.log("SPAWN CREEP AT E53N59");
       var parts = [
         WORK, WORK, WORK, WORK, WORK,
         CARRY,
@@ -202,6 +213,7 @@ module.exports.loop = function () {
 
       var role = '';
       // var wallsToRepair = false;
+      console.log('harvesterCount', harvesterCount);
       if (
         harvesterCount < 2 ||
         (harvesterCount == 2 && harvesterTicksToLive < 200)
@@ -238,12 +250,15 @@ module.exports.loop = function () {
 
       memory.role = role;
 
+      console.log('memory', JSON.stringify(memory));
+      console.log('parts', JSON.stringify(parts));
+
       if (role != '') {
-        Game.spawns['Spawn1'].spawnCreep(
-          parts,
-          undefined,
-          { memory: memory }
-        );
+        let returnSpawn = Game.spawns['Spawn1'].spawnCreep(parts, role + Game.time, {
+          memory: memory
+        });
+
+        console.log('returnSpawn', returnSpawn);
       }
       // else {
       //     Game.spawns['Spawn1'].createCreep(
@@ -260,6 +275,13 @@ module.exports.loop = function () {
     var towers = Game.rooms["E53N59"].find(
       FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER } });
     towers.forEach(tower => tower.attack(findInvaders[0]));
+  }
+
+  for (let spawnName in Game.spawns) {
+    console.log("Spawn Name:", JSON.stringify(Game.spawns[spawnName].name));
+    //console.log("Spawn Room Name:", JSON.stringify(Game.spawns[spawnName].room.name));
+    //console.log("Spawn Room Creeps:", JSON.stringify(Game.spawns[spawnName].room.find(FIND_MY_CREEPS)));
+
   }
 
   // console.log(JSON.stringify(Game.spawns['Spawn1'].room.controller,undefined,2));

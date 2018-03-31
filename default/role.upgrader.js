@@ -42,7 +42,10 @@ var roleUpgrader = {
                 creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
             }
             // move to controller anyway
-            creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
+            if (creep.room == 'E53N59') {
+                creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#900' } });
+            }
+
         }
         // remove fixed String in future
         if (creep.room.name != creep.room.home) {
