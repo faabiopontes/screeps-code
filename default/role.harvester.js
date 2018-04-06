@@ -31,20 +31,6 @@ var roleHarvester = {
         }
         return;
       }
-      // const tombstones = creep.room.find(FIND_TOMBSTONES);
-      // if (tombstones.length > 0) {
-      //   console.log("FIND TOMBSTONES");
-      //   for (let tombstone in tombstones) {
-      //     let closestCreep = tombstone.findClosestByPath(FIND_MY_CREEPS);
-
-      //     let returnWithdraw = closestCreep.withdraw(tombstone, RESOURCE_ENERGY);
-      //     console.log('returnWithdraw', returnWithdraw);
-      //     if (returnWithdraw == ERR_NOT_IN_RANGE) {
-      //       closestCreep.moveTo(tombstone);
-      //     }
-      //   }
-      //   return;
-      // }
       var closestSource = creep.room.find(FIND_SOURCES);
       closestSource = closestSource[creep.memory.mineSource];
       returnHarvest = creep.harvest(closestSource);

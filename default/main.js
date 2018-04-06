@@ -54,6 +54,21 @@ module.exports.loop = function () {
 
   var hitsPercentage = lowestStructureToRepair[0].hits / lowestStructureToRepair[0].hitsMax;
 
+  // const tombstones = creep.room.find(FIND_TOMBSTONES);
+  // if (tombstones.length > 0) {
+  //   console.log("FIND TOMBSTONES");
+  //   for (let tombstone in tombstones) {
+  //     let closestCreep = tombstone.findClosestByPath(FIND_MY_CREEPS);
+
+  //     let returnWithdraw = closestCreep.withdraw(tombstone, RESOURCE_ENERGY);
+  //     console.log('returnWithdraw', returnWithdraw);
+  //     if (returnWithdraw == ERR_NOT_IN_RANGE) {
+  //       closestCreep.moveTo(tombstone);
+  //     }
+  //   }
+  //   return;
+  // }
+
   var mineSource = 0;
   // when sources regenerate
   // recalc where creeps should mine
@@ -180,7 +195,8 @@ module.exports.loop = function () {
     "E: " + Game.rooms["E54N59"].energyAvailable + "/" + Game.rooms["E54N59"].energyCapacityAvailable,
     "H: " + E54N59.harvesterCount,
     "U: " + E54N59.upgraderCount,
-    "B: " + E54N59.builderCount
+    "B: " + E54N59.builderCount,
+    "R: " + E54N59.repairerCount
   );
 
   if (findInvaders.length == 0) {
