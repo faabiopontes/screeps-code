@@ -11,10 +11,14 @@ require('prototype.creep');
 module.exports.loop = function () {
   const FSP_PERCENTAGE_TO_REPAIR = 0.3;
 
+  const E54N59 = {};
+  E54N59.harvesterCount = 0;
+  E54N59.upgraderCount = 0;
+  E54N59.attackerCount = 0;
+  E54N59.builderCount = 0;
+  E54N59.repairerCount = 0;
+
   var harvesterCount = 0;
-  var E54N59_harvesterCount = 0;
-  var E54N59_upgraderCount = 0;
-  var E54N59_attackerCount = 0;
   var upgraderCount = 0;
   var builderCount = 0;
   var repairerCount = 0;
@@ -78,8 +82,8 @@ module.exports.loop = function () {
       roleHarvester.run(creep);
 
       if (creep.memory.home == 'E54N59') {
-        console.log(JSON.stringify(creep.name));
-        E54N59_harvesterCount++;
+        // console.log(JSON.stringify(creep.name));
+        E54N59.harvesterCount++;
       } else {
         harvesterCount++;
 
@@ -96,7 +100,7 @@ module.exports.loop = function () {
       }
     }
     if (creep.memory.role == 'attacker') {
-      E54N59_attackerCount++;
+      E54N59.attackerCount++;
       hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
       let attackReturn = creep.attack(hostileCreep);
       console.log("attackReturn", attackReturn);
@@ -107,6 +111,10 @@ module.exports.loop = function () {
     }
     if (creep.memory.role == 'repairer') {
       roleRepairer.run(creep);
+      if (creep.memory.home == 'E54N59') {
+        E54N59.repairerCount++;
+        continue;
+      }
       repairerCount++;
     }
     if (creep.memory.role == 'wallRepairer') {
@@ -117,7 +125,7 @@ module.exports.loop = function () {
 
       roleUpgrader.run(creep);
       if (creep.memory.home == 'E54N59') {
-        E54N59_upgraderCount++;
+        E54N59.upgraderCount++;
         continue;
       }
       upgraderCount++;
@@ -132,6 +140,10 @@ module.exports.loop = function () {
 
     if (creep.memory.role == 'builder') {
       roleBuilder.run(creep);
+      if (creep.memory.home == 'E54N59') {
+        E54N59.builderCount++;
+        continue;
+      }
       builderCount++;
     }
 
@@ -150,6 +162,7 @@ module.exports.loop = function () {
   // console.log(JSON.stringify(sources,undefined,2));
 
   console.log(
+    "E53N59",
     "E: " + energyAvailable + "/" + energyCapacity,
     "H: " + harvesterCount + " (" + countHarvestSource0 + "/" + countHarvestSource1 + ") (" + harvesterTicksToLive + ")",
     "U: " + upgraderCount + " (" + countMineSource0 + "/" + countMineSource1 + ")",
@@ -161,6 +174,13 @@ module.exports.loop = function () {
     "Sources: (energy/ticks)",
     "(" + sources[0].energy + "/" + (sources[0].ticksToRegeneration ? sources[0].ticksToRegeneration : 300) + ")",
     "(" + sources[1].energy + "/" + (sources[1].ticksToRegeneration ? sources[1].ticksToRegeneration : 300) + ")",
+  );
+  console.log(
+    "E54N59",
+    "E: " + Game.rooms["E54N59"].energyAvailable + "/" + Game.rooms["E54N59"].energyCapacityAvailable,
+    "H: " + E54N59.harvesterCount,
+    "U: " + E54N59.upgraderCount,
+    "B: " + E54N59.builderCount
   );
 
   if (findInvaders.length == 0) {
@@ -179,30 +199,65 @@ module.exports.loop = function () {
       });
     }
 
-    console.log("E54N59 energyAvailable", Game.rooms['E54N59'].energyAvailable);
-    console.log("E54N59_harvesterCount", E54N59_harvesterCount);
-    console.log("E54N59_upgraderCount", E54N59_upgraderCount);
     if (Game.rooms['E54N59'].energyAvailable > 299) {
-      E54N59_role = '';
-      E54N59_parts = [WORK, WORK, CARRY, MOVE];
-
-      E54N59_hostileCreeps = Game.rooms['E54N59'].find(FIND_HOSTILE_CREEPS);
+      console.log("SPAWN CREEP AT E54N59");
 
 
 
-      if (E54N59_harvesterCount < 2) {
-        E54N59_role = 'harvester';
-      } else if (E54N59_upgraderCount < 8) {
-        E54N59_role = 'upgrader';
-      } else if (E54N59_hostileCreeps.length > 0 && E54N59_attackerCount == 0) {
-        E54N59_role = 'attacker';
-        E54N59_parts = [ATTACK, MOVE];
+      E54N59.lowestStructureToRepair = Game.rooms['E54N59'].find(FIND_STRUCTURES, {
+        filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_CONTROLLER
+      }).sort(function (a, b) {
+        return a.hits - b.hits;
+      });
+
+      E54N59.findInvaders = Game.rooms['E54N59'].find(FIND_HOSTILE_CREEPS, {
+        filter: (s) => s.owner.username == 'Invader'
+      })
+      if (E54N59.findInvaders.length) {
+        Game.notify("OUR FORCES ARE UNDER ATTACK!")
+        console.log("OUR FORCES ARE UNDER ATTACK");
       }
 
-      console.log("E54N59_role", E54N59_role);
-      if (E54N59_role != '') {
-        var retornoSpawn = Game.spawns['Spawn2'].createCreep(E54N59_parts, undefined, { role: E54N59_role, target: 'E54N59', home: 'E54N59', mineSource: 0 });
-        console.log(retornoSpawn);
+
+      E54N59.hitsPercentage = E54N59.lowestStructureToRepair[0].hits / E54N59.lowestStructureToRepair[0].hitsMax;
+
+      E54N59.role = '';
+      E54N59.parts = [WORK, WORK, CARRY, MOVE];
+      E54N59.memory = {
+        target: 'E54N59',
+        home: 'E54N59',
+        mineSource: 0
+      }
+
+      E54N59.hostileCreeps = Game.rooms['E54N59'].find(FIND_HOSTILE_CREEPS);
+
+      if (E54N59.harvesterCount < 2) {
+        E54N59.role = 'harvester';
+      } else if (E54N59.upgraderCount < 8) {
+        E54N59.role = 'upgrader';
+      } else if (E54N59.hostileCreeps.length > 0 && E54N59.attackerCount == 0) {
+        E54N59.role = 'attacker';
+        E54N59.parts = [ATTACK, MOVE];
+      } else if (E54N59.builderCount < 1 && Game.rooms['E54N59'].energyAvailable > 699) {
+        E54N59.role = 'builder';
+        E54N59.parts.push(WORK, WORK, WORK, MOVE, MOVE);
+      } else if (
+        E54N59.repairerCount < 1 &&
+        E54N59.hitsPercentage <= FSP_PERCENTAGE_TO_REPAIR &&
+        Game.rooms['E54N59'].energyAvailable > 499
+      ) {
+        E54N59.parts.push(MOVE, MOVE, CARRY, CARRY);
+        E54N59.role = 'repairer';
+      }
+
+
+      console.log("E54N59.role", E54N59.role);
+      if (E54N59.role != '') {
+
+        E54N59.memory.role = E54N59.role;
+        var returnSpawn = Game.spawns['Spawn2'].spawnCreep(E54N59.parts, E54N59.role + Game.time, { memory: E54N59.memory });
+        console.log(JSON.stringify(E54N59));
+        console.log("Return Spawn: " + returnSpawn);
       }
     }
 
@@ -222,7 +277,7 @@ module.exports.loop = function () {
 
       var role = '';
       // var wallsToRepair = false;
-      console.log('harvesterCount', harvesterCount);
+      // console.log('harvesterCount', harvesterCount);
       if (
         harvesterCount < 2 ||
         (harvesterCount == 2 && harvesterTicksToLive < 200)
@@ -249,25 +304,25 @@ module.exports.loop = function () {
         // else {
         role = 'upgrader';
       }
-        else if (
-          longDistanceBuilderUpgraderCount < 2
-        ) {
-          parts.push(MOVE, CARRY, CARRY);
-          role = 'longDistanceBuilderUpgrader';
-          memory.target = "E52N59";
-        }
+      else if (
+        longDistanceBuilderUpgraderCount < 2
+      ) {
+        parts.push(MOVE, CARRY, CARRY);
+        role = 'longDistanceBuilderUpgrader';
+        memory.target = "E52N59";
+      }
 
       memory.role = role;
 
-      console.log('memory', JSON.stringify(memory));
-      console.log('parts', JSON.stringify(parts));
+      // console.log('memory', JSON.stringify(memory));
+      // console.log('parts', JSON.stringify(parts));
 
       if (role != '') {
         let returnSpawn = Game.spawns['Spawn1'].spawnCreep(parts, role + Game.time, {
           memory: memory
         });
 
-        console.log('returnSpawn', returnSpawn);
+        console.log('Return Spawn: ', returnSpawn);
       }
       // else {
       //     Game.spawns['Spawn1'].createCreep(
@@ -286,12 +341,11 @@ module.exports.loop = function () {
     towers.forEach(tower => tower.attack(findInvaders[0]));
   }
 
-  for (let spawnName in Game.spawns) {
-    console.log("Spawn Name:", JSON.stringify(Game.spawns[spawnName].name));
-    //console.log("Spawn Room Name:", JSON.stringify(Game.spawns[spawnName].room.name));
-    //console.log("Spawn Room Creeps:", JSON.stringify(Game.spawns[spawnName].room.find(FIND_MY_CREEPS)));
-
-  }
+  // for (let spawnName in Game.spawns) {
+  //   console.log("Spawn Name:", JSON.stringify(Game.spawns[spawnName].name));
+  //   console.log("Spawn Room Name:", JSON.stringify(Game.spawns[spawnName].room.name));
+  //   console.log("Spawn Room Creeps:", JSON.stringify(Game.spawns[spawnName].room.find(FIND_MY_CREEPS)));
+  // }
 
   // console.log(JSON.stringify(Game.spawns['Spawn1'].room.controller,undefined,2));
 }

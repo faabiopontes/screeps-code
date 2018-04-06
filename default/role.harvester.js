@@ -54,6 +54,10 @@ var roleHarvester = {
         // sourceActive = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
         // check if we can use id on the return
         // save id on the memory of the creep instead
+        if (creep.memory.home == 'E54N59') {
+          creep.moveTo(sources[0]);
+          return;
+        }
         creep.memory.mineSource = (creep.memory.mineSource == 1) ? 0 : 1;
       }
 
