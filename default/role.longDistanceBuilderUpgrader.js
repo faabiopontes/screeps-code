@@ -35,10 +35,10 @@ module.exports = {
                 }
             }
             // if not in home room...
-            else if (creep.room.name == creep.memory.home && creep.memory.upgrading) {
+            else if (creep.room.name != creep.memory.home && creep.memory.upgrading) {
                 this.goTo(creep, creep.memory.home);
             }
-            else if (creep.room.name == creep.memory.target && creep.memory.upgrading) {
+            else if (creep.room.name == creep.memory.home && creep.memory.upgrading) {
                 var target = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
                 if (target) {
                     if (creep.build(target) == ERR_NOT_IN_RANGE) {
