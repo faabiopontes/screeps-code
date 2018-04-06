@@ -2,7 +2,8 @@ var roleHarvester = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
-    //creep.say("H");
+    creep.say("H");
+
     if (creep.memory.target && creep.room.name != creep.memory.target) {
       // find exit to target room
       var exit = creep.room.findExitTo(creep.memory.target);
@@ -21,7 +22,9 @@ var roleHarvester = {
     if (creep.memory.harvesting) {
       //var sources = creep.room.find(FIND_SOURCES);
       // KEEP IN MIND THAT THIS CODE IS EXECUTED FOR EACH CREEP
-      const droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+      const droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+        filter: { resourcetype: RESOURCE_ENERGY }
+      });
       if (droppedResource) {
         if (creep.pickup(droppedResource) == ERR_NOT_IN_RANGE) {
           creep.moveTo(droppedResource);
@@ -101,10 +104,10 @@ var roleHarvester = {
         // if the creep can't find spawns, extensions
         // or storages and containers
         // it becomes a longDistanceBuilderUpgrader
-        else {
-          creep.memory.role = 'longDistanceBuilderUpgrader';
-          creep.memory.target = 'E54N59';
-        }
+        // else {
+        //   creep.memory.role = 'longDistanceBuilderUpgrader';
+        //   creep.memory.target = 'E54N59';
+        // }
         // when we don't have anywhere to put our energy
         // we can act as upgraders
         // if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {

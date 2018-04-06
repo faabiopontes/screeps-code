@@ -30,6 +30,9 @@ var roleUpgrader = {
                 // sourceActive = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
                 // check if we can use id on the return
                 // save id on the memory of the creep instead
+                if (creep.memory.home == 'E54N59') {
+                    return;
+                }
                 creep.memory.mineSource = (creep.memory.mineSource == 1) ? 0 : 1;
             }
             // if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {

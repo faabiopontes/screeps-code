@@ -192,7 +192,7 @@ module.exports.loop = function () {
 
       if (E54N59_harvesterCount < 2) {
         E54N59_role = 'harvester';
-      } else if (E54N59_upgraderCount < 10) {
+      } else if (E54N59_upgraderCount < 8) {
         E54N59_role = 'upgrader';
       } else if (E54N59_hostileCreeps.length > 0 && E54N59_attackerCount == 0) {
         E54N59_role = 'attacker';
@@ -249,13 +249,13 @@ module.exports.loop = function () {
         // else {
         role = 'upgrader';
       }
-      else if (
-        longDistanceBuilderUpgraderCount < 2
-      ) {
-        parts.push(MOVE, CARRY, CARRY);
-        role = 'longDistanceBuilderUpgrader';
-        memory.target = "E54N59";
-      }
+        else if (
+          longDistanceBuilderUpgraderCount < 2
+        ) {
+          parts.push(MOVE, CARRY, CARRY);
+          role = 'longDistanceBuilderUpgrader';
+          memory.target = "E52N59";
+        }
 
       memory.role = role;
 
